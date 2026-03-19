@@ -8,14 +8,32 @@ load_dotenv("/home/tien/elt-pipeline/.env")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-TABLES = ["customer", "products", "orders", "target_orders", "order_lines"]  
-
-def extract():
+def extract_table(table_name: str) -> pd.DataFrame:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    data = {}
-    for table in TABLES:
-        response = supabase.table(table).select("*").execute()
-        df = pd.DataFrame(response.data)
-        data[table] = df
-        print(f"Extracted {table}: {len(df)} rows")
-    return data
+    
+    all_rows = []
+    page_size = 1000
+    offset    = 0
+
+    while True:
+        response = (
+            supabase.table(table_name)
+            .select("*")
+            .range(offset, offset + page_size - 1)
+            .execute()
+        )
+
+        rows = response.data
+        if not rows:
+            break
+
+        all_rows.extend(rows)
+        print(f"[EXTRACT] {table_name} | offset {offset} → {offset + len(rows) - 1}")
+        if len(rows) < page_size:
+            break
+
+        offset += page_size
+
+    df = pd.DataFrame(all_rows)
+    print(f"[EXTRACT] Completed → {table_name} | total rows: {len(df)}")
+    return df

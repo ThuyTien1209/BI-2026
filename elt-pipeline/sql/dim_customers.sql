@@ -1,24 +1,11 @@
-CREATE TABLE IF NOT EXISTS `analytics.dim_customers` (
-    customer_id   STRING,
-    customer_name STRING,
-    city          STRING,
-)
+{% set clean_run_id = run_id | replace(':', '_') | replace('.', '_') | replace('+', '_') %}
 
-MERGE `analytics.dim_customers` T
-USING (
-    SELECT
-        id AS customer_id,
-        customer_name,
-        city
-    FROM `raw.customers`
-) S
-ON T.customer_id = S.customer_id
-
-WHEN MATCHED THEN
-UPDATE SET
-    customer_name = S.customer_name,
-    city = S.city
-
-WHEN NOT MATCHED THEN
-INSERT (customer_id, customer_name, city)
-VALUES (S.customer_id, S.customer_name, S.city);
+CREATE TABLE `analytics.dim_customers_{{ clean_run_id }}` AS
+SELECT
+  c.customer_id,
+  TRIM(c.customer_name) AS customer_name,
+  c.city,
+  CURRENT_TIMESTAMP() AS load_time,
+  '{{ run_id }}' AS run_id
+FROM raw.customer c
+WHERE run_id = '{{ run_id }}';

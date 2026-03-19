@@ -9,6 +9,7 @@ services:
       AIRFLOW__CORE__EXECUTOR: SequentialExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       GOOGLE_APPLICATION_CREDENTIALS: /opt/airflow/credentials/gcp_key.json
+      AIRFLOW_CONN_GOOGLE_CLOUD_DEFAULT: '{"conn_type": "google_cloud_platform", "extra": {"key_path": "/opt/airflow/credentials/gcp_key.json", "project": "bi-project-2026"}}'
     env_file:
       - .env
     volumes:

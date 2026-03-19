@@ -3,8 +3,8 @@ WITH date_spine AS (
     SELECT date
     FROM UNNEST(
         GENERATE_DATE_ARRAY(
-            (SELECT MIN(order_placement_date) FROM `raw.orders`),
-            (SELECT MAX(actual_delivery_date) FROM `raw.order_lines`)
+            (SELECT MIN(SAFE.PARSE_DATE('%Y-%m-%d', order_placement_date)) FROM `raw.orders`),
+            (SELECT MAX(SAFE.PARSE_DATE('%Y-%m-%d', actual_delivery_date)) FROM `raw.order_lines`)
         )
     ) AS date
 )
