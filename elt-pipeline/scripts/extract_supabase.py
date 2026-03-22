@@ -3,7 +3,9 @@ from dotenv import load_dotenv
 from supabase import create_client
 import pandas as pd
 
-load_dotenv("/home/tien/elt-pipeline/.env")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+env_path = os.path.join(script_dir, "..", ".env")
+load_dotenv(env_path)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")

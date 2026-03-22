@@ -51,7 +51,7 @@ with DAG(
     start_date=datetime(2026,3,19),
     schedule="@weekly",
     catchup=False,
-    tags=["hkd2026", "elt"],
+    tags=["automated", "elt"],
 ) as dag:
 
     # EXTRACT & LOAD
