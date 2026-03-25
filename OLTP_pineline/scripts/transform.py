@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
 import re
+import os
 
 np.random.seed(42)
+os.makedirs("data/processed", exist_ok=True)
 
 def get_product_key(product_name):
     return re.sub(r'\d+', '', product_name).strip()
@@ -117,11 +119,13 @@ def process_products(path="data/raw/dim_products.csv"):
     df = df.drop_duplicates(subset=['product_id'])
 
     #  validate
-    assert df['price'].isnull().sum() == 0, "Price null ❌"
-    assert df['cost'].isnull().sum() == 0, "Cost null ❌"
-    assert (df['cost'] < df['price']).all(), "Cost >= Price ❌"
+    assert df['price'].isnull().sum() == 0, "Price null "
+    assert df['cost'].isnull().sum() == 0, "Cost null "
+    assert (df['cost'] < df['price']).all(), "Cost >= Price "
 
     print(f" Products processed: {len(df)} rows")
+
+    df.to_csv("data/processed/products.csv", index=False)
 
     return df
 
@@ -179,6 +183,8 @@ def process_orders(path="data/raw/fact_order_lines.csv"):
     ]]
 
     print(f" Orders: {len(orders)} | Order lines: {len(order_lines)}")
+    orders.to_csv("data/processed/orders.csv", index=False)
+    order_lines.to_csv("data/processed/order_lines.csv", index=False)
 
     return orders, order_lines
 
@@ -202,7 +208,8 @@ def process_targets(path="data/raw/dim_targets_orders.csv"):
 
     df = df.drop_duplicates(subset=['customer_id'])
 
-    print(f"✅ Targets processed: {len(df)} rows")
+    print(f" Targets processed: {len(df)} rows")
+    df.to_csv("data/processed/targets.csv", index=False)
 
     return df
 
@@ -226,5 +233,6 @@ def process_customers(path="data/raw/dim_customers.csv"):
     df = df.drop_duplicates(subset=['customer_id'])
 
     print(f" Customers processed: {len(df)} rows")
+    df.to_csv("data/processed/customers.csv", index=False)
 
     return df
